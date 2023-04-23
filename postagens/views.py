@@ -19,6 +19,8 @@ from .models import PostagemModel
 
 
 class PostagensViews(APIView):
+    serializer_class = PostagemSerializer
+    # queryset = PostagemModel.objects.all()
 
     def get_object(self, pk):
         try:
