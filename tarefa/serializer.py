@@ -10,7 +10,7 @@ class TarefaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TarefaModel
-        fields = ['id', 'name', 'done','delete']
+        fields = ['id', 'name', 'done','delete','user']
 
     def create(self, validated_data):
         return super().create(validated_data)

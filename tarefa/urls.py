@@ -6,7 +6,8 @@ from .views import TarefaViews
 
 
 urlpatterns = [
-    path('', TarefaViews.as_view()),
+    path('', TarefaViews.as_view(), name='tarefa-list'),
+    path('<id>/', TarefaViews.as_view(), name='tarefa-detail'),
     
     
 ]

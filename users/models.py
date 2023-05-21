@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 
 # default="user"
 # https://docs.djangoproject.com/en/4.0/ref/models/fields/#choices
-class User(AbstractUser):
+class UsersModel(AbstractUser):
     TIPO_CHOICES = [
         ('root', 'Root'),
         ('client', 'Client'),
