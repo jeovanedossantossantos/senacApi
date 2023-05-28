@@ -48,6 +48,7 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         
         validated_data['password'] = make_password(validated_data.get('password'))
+        validated_data['tipo']='client'
         user = super().create(validated_data)
         user.tokens = self.get_tokens(user)
         return user
@@ -59,3 +60,12 @@ class UserSerializer(serializers.ModelSerializer):
     #     instance.tipo = validated_data.get('tipo', instance.tipo)
     #     instance.save()
     #     return instance
+
+class UsersListSerializer(serializers.ModelSerializer):
+    
+    
+    
+    class Meta:
+        model = UsersModel
+        fields = ["id",'username', 'email', "tipo","suspenso"]
+   

@@ -13,3 +13,4 @@ class UsersModel(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     tipo=models.CharField(max_length=10, choices=TIPO_CHOICES,default='client')
     suspenso = models.BooleanField(default=False)
+    email = models.EmailField(unique=True)

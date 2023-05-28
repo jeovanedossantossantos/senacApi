@@ -27,18 +27,14 @@ from .models import TarefaModel
 class TarefaViews(APIView):
     serializer_class = TarefaSerializer
     permission_classes = [ValidToken,IsNotSuspended]
-    # queryset = TarefaModel.objects.all()
-    # print(permission_classes[0])
+    queryset = TarefaModel.objects.all()
+    
     def get_object(self, pk, user):
         try:
-            return TarefaModel.objects.get(pk=pk, user=user)
+            return self.queryset.get(pk=pk, user=user)
         except TarefaModel.DoesNotExist:
             raise Http404
-    # def get_object(self, pk):
-    #     try:
-    #         return TarefaModel.objects.get(pk=pk)
-    #     except TarefaModel.DoesNotExist:
-    #         raise Http404
+    
 
     def post(self, request):
         
@@ -51,32 +47,21 @@ class TarefaViews(APIView):
             return Response(TarefaSerializer(tarefa).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def get(self, request, id=None, format=None):
-    #     user_id=jwt.decode(request.headers.get("token"),settings.SECRET_KEY,algorithms=['HS256'])
-       
-    #     user=UUID(user_id['user_id'])
-    #     if id is not None:
-    #         tarefa = self.get_object(id,user)
-    #         serializer = TarefaSerializer(tarefa)
-    #     else:
-    #         tarefas = TarefaModel.objects.filter(user=user)
-    #         serializer = TarefaSerializer(tarefas, many=True)
 
-    #     return Response(serializer.data)
 
     def get(self, request, id=None, format=None):
         name = request.query_params.get('name')
         user_id=jwt.decode(request.headers.get("token"),settings.SECRET_KEY,algorithms=['HS256'])
-        print(user_id)
+        
         user=UUID(user_id['user_id'])
         if id is not None:
             tarefa = self.get_object(id,user=user)
             serializer = TarefaSerializer(tarefa)
         elif name is not None:
-            tarefas = TarefaModel.objects.filter(name__icontains=name, delete=False)
+            tarefas = self.queryset.filter(name__icontains=name, delete=False)
             serializer = TarefaSerializer(tarefas, many=True)
         else:
-            tarefas = TarefaModel.objects.filter(user=user,delete=False)
+            tarefas = self.queryset.filter(user=user,delete=False)
             serializer = TarefaSerializer(tarefas, many=True)
 
         return Response(serializer.data)
@@ -85,7 +70,7 @@ class TarefaViews(APIView):
         user_id=jwt.decode(request.headers.get("token"),settings.SECRET_KEY,algorithms=['HS256'])
        
         user=UUID(user_id['user_id'])
-        tarefa = TarefaModel.objects.get(id=id,user=user)
+        tarefa = self.queryset.get(id=id,user=user)
         serializer = TarefaSerializer(tarefa, data=request.data, partial=True)
 
         if serializer.is_valid():
@@ -98,7 +83,7 @@ class TarefaViews(APIView):
         user_id=jwt.decode(request.headers.get("token"),settings.SECRET_KEY,algorithms=['HS256'])
        
         user=UUID(user_id['user_id'])
-        tarefa = TarefaModel.objects.get(id=id,user=user)
+        tarefa = self.queryset.get(id=id,user=user)
         tarefa.delete = True
         tarefa.save()
 

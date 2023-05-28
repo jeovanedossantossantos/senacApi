@@ -3,7 +3,7 @@ from rest_framework import permissions
 from rest_framework import generics
 
 from tarefa.permissions import ValidAdmin, ValidToken
-from .serializers import UserSerializer,CustomTokenObtainPairSerializer
+from .serializers import UserSerializer,CustomTokenObtainPairSerializer, UsersListSerializer
 from .models import UsersModel
 from django.http import Http404
 from rest_framework.response import Response
@@ -58,31 +58,15 @@ class CreateUserView(generics.CreateAPIView):
 
 class UserViewsPrivate(APIView):
     permission_classes = (IsAuthenticated,)
+    queryset = UsersModel.objects.all()
    
     def get_object(self,pk):
         
         try:
-            return UsersModel.objects.get(pk=pk)
+            return self.queryset.get(pk=pk)
         except UsersModel.DoesNotExist:
             raise Http404
   
-    # criar um classe admin e colocar essa função nela
-    # def delete(self, request, id, format=None):
-    #     user_id=Middlewares.decode(request.headers)
-        
-    #     tipo = self.get_object(user_id)
-    #     data = UserSerializer(tipo).data
-    #     if((user_id == id) or (data["tipo"]=="root")):
-            
-
-    #         user = self.get_object(id)
-    #         user.delete()
-    #         serializer = UserSerializer(user)
-    #         if serializer.data:
-
-    #             return Response({'detail':"Excluido com sucesso."})
-    #     else:
-    #         return Response({'detail':"Não autorizado"})
 
     def put(self, request, id, format=None):
         
@@ -116,11 +100,11 @@ class UserViewsPrivate(APIView):
 
 class AdminView(APIView):
     permission_classes = [ValidToken,ValidAdmin]
-    
+    queryset = UsersModel.objects.all()
     def get_object(self,pk,tipo):
         
         try:
-            return UsersModel.objects.get(pk=pk,tipo=tipo)
+            return self.queryset.get(pk=pk,tipo=tipo)
         except UsersModel.DoesNotExist:
             raise Http404 
     # def get(self, request, id, format=None):
@@ -135,20 +119,21 @@ class AdminView(APIView):
         
         if id is not None:
             user = self.get_object(id,tipo="client")
-            serializer = UsersModel(user)
+            serializer = UsersListSerializer(user)
         else:
-            users = UsersModel.objects.filter(tipo="client")
-            serializer = UserSerializer(users, many=True)
+            users = self.queryset.filter(tipo="client")
+            serializer = UsersListSerializer(users, many=True)
         
         return Response(serializer.data)
     
     def patch(self, request, id=None):
-        print(id,request.data)
+        
         user = self.get_object(id,tipo="client")
         serializer = UserSerializer(user, data=request.data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
+            serializer = UsersListSerializer(serializer.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

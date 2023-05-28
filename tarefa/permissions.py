@@ -5,7 +5,7 @@ from rest_framework import permissions
 
 
 from users.models import UsersModel
-# from apps.user.services.auth import validate_confirmation_token, validate_token
+
 class IsNotSuspended(permissions.BasePermission):
     def has_permission(self, request, view):
         user = request.user
@@ -22,8 +22,7 @@ def validate_token(token):
             return False
 
         user.refresh_from_db()
-        # key = user.password + SECRET
-        # payload = jwt.decode(token, key, algorithms="HS256")
+        
 
         return user
     except Exception as e:
@@ -41,7 +40,7 @@ class ValidToken(permissions.BasePermission):
         token = request.headers.get("token")
         
         user = validate_token(token)
-        # print(user)
+
         if not user:
             return False
 
@@ -54,10 +53,10 @@ class ValidAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         token = request.headers.get("token")
         payload_unsafe = jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
-        # print(payload_unsafe)
+        
         try:
             user = UsersModel.objects.get(id=payload_unsafe["user_id"],tipo="root")
-            print(user)
+           
             if not user:
                 return False
             request.user = user
@@ -65,10 +64,4 @@ class ValidAdmin(permissions.BasePermission):
         except Exception as e:
         
             return False
-        # if (not user):
-        #     return False
-
-        # request.user = user
         
-        # return True
-    # has_user_permission(user, request.get_full_path())
