@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'tarefa.apps.TarefaConfig',
     'users.apps.UserConfig',
-    'corsheaders'
+    'corsheaders',
+   
+   'drf_yasg',
 ]
 
 MIDDLEWARE = [

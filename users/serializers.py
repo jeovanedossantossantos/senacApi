@@ -26,6 +26,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['tipo'] = user.tipo
         token['suspenso'] = user.suspenso
         return token
+    
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     tokens = serializers.SerializerMethodField()
@@ -68,4 +69,14 @@ class UsersListSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsersModel
         fields = ["id",'username', 'email', "tipo","suspenso"]
+
+class UserUpdateSerializer(serializers.ModelSerializer):
    
+    
+    class Meta:
+        model = UsersModel
+        fields = ['username', 'email', 'password']
+    
+    username = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False)
+    password = serializers.CharField( required=False)

@@ -22,8 +22,18 @@ from users.models import UsersModel
 
 from .serializer import TarefaSerializer
 from .models import TarefaModel
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status, permissions, serializers
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-
+class TarefaViewSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField()
+    done = serializers.BooleanField()
+    delete = serializers.BooleanField()
+    create_at = serializers.DateTimeField()
+  
 class TarefaViews(APIView):
     serializer_class = TarefaSerializer
     permission_classes = [ValidToken,IsNotSuspended]
@@ -48,7 +58,7 @@ class TarefaViews(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+    @swagger_auto_schema(request_body=TarefaViewSerializer)
     def get(self, request, id=None, format=None):
         name = request.query_params.get('name')
         user_id=jwt.decode(request.headers.get("token"),settings.SECRET_KEY,algorithms=['HS256'])

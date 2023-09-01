@@ -3,7 +3,7 @@ from rest_framework import permissions
 from rest_framework import generics
 
 from tarefa.permissions import ValidAdmin, ValidToken
-from .serializers import UserSerializer,CustomTokenObtainPairSerializer, UsersListSerializer
+from .serializers import UserSerializer,UserUpdateSerializer,CustomTokenObtainPairSerializer, UsersListSerializer
 from .models import UsersModel
 from django.http import Http404
 from rest_framework.response import Response
@@ -57,7 +57,7 @@ class CreateUserView(generics.CreateAPIView):
 
 
 class UserViewsPrivate(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [ValidToken]
     queryset = UsersModel.objects.all()
    
     def get_object(self,pk):
@@ -68,35 +68,41 @@ class UserViewsPrivate(APIView):
             raise Http404
   
 
-    def put(self, request, id, format=None):
+    def put(self, request):
         
         user_id=Middlewares.decode(request.headers)
         tipo = self.get_object(user_id)
         data = UserSerializer(tipo).data
-        if(user_id == id):
-            messagem = 'Changed not password'
-            user = self.get_object(id)
-            userAnt = serializer = UserSerializer(user)
-            data = request.data
-        
-            try:
-            
-                if(user.check_password(data['password_back'])):
-                    user.set_password(data['password'])
-                    messagem="Changed password"
-            except:
-                messagem = 'Changed not password'
-                # data['password'] = 'null'
+        # print(tipo)
+        # print(id)
+        # if(user_id == id):
+        messagem = 'Changed not password'
+        user = self.get_object(user_id)
+        userAnt = serializer = UserSerializer(user)
+        data = request.data
 
-            serializer = UserSerializer(user, data=data)
-            
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"data":serializer.data,"messagem":messagem})
         
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'detail':"Não autorizado"})
+        try:
+            print(data)
+
+            if(data['password'] and user.check_password(data['password_back'])):
+                user.set_password(data['password'])
+                messagem="Changed password"
+        except:
+            messagem = 'Changed not password'
+            # data['password'] = 'null'
+
+        serializer = UserUpdateSerializer(user, data=data)
+        
+        
+        if serializer.is_valid():
+            serializer.save()
+            
+            return Response({"data":"Atulização com sucesso!","messagem":messagem})
+    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # else:
+        #     return Response({'detail':"Não autorizado"})
 
 class AdminView(APIView):
     permission_classes = [ValidToken,ValidAdmin]

@@ -19,6 +19,8 @@ services:
     build: .
     image: django-docker:0.0.1
     command: [ "./run_web.sh" ]
+    volumes:
+      - .:/usr/projects
 
     ports:
       - "8000:8000"
