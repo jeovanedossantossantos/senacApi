@@ -128,7 +128,7 @@ DATABASES = {
         'USER':  config('USER_MYSQL'),
         'PASSWORD': config('PASSWORD_MYSQL'),
         # 'db' caso exista um serviço com esse nome.
-        'HOST':  'db',
+        'HOST':  config('HOST_MYSQL'),
         'PORT': "3306",
     }
 }
