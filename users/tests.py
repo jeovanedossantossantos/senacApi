@@ -15,8 +15,6 @@ from rest_framework.test import APITestCase
 
 class UsersTestCase(APITestCase):
 
-   
-
     def test_created_user(self):
 
         created = self.client.post("/users/",{
@@ -33,8 +31,7 @@ class UsersTestCase(APITestCase):
     def test_created_user_error_required_email(self):
 
         created = self.client.post("/users/",{
-                "username":"teste",
-                
+                "username":"teste",        
                 "password":"123"
 
         })
@@ -43,8 +40,7 @@ class UsersTestCase(APITestCase):
         
     def test_created_user_error_required_username(self):
 
-            created = self.client.post("/users/",{
-                    
+            created = self.client.post("/users/",{     
                     "email":"teste@gamil.com",
                     "password":"123"
 
@@ -68,7 +64,7 @@ class UsersTestCase(APITestCase):
 
         self.assertEqual(created.status_code,400)
 
-        
+
     def test_login_user(self):
 
         self.client.post("/users/",{
@@ -83,7 +79,6 @@ class UsersTestCase(APITestCase):
                 "password":"123"
 
         })
-        
         user_json = login.json()
         self.assertEqual(login.status_code,200)
         self.assertTrue(user_json["refresh"])
